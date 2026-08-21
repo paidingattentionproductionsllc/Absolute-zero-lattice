@@ -1,0 +1,1 @@
+- [GitHub publication permissions](github-publication.md) — source publishes normally, but workflow files need separate write authorization.

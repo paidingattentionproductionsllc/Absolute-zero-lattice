@@ -22,7 +22,8 @@ getcontext().prec = 500
 AZL_CONTRACT = {
     "LAW": {
         "0 * N": 0, "N * 0": "N", "1 * N": "N+1", "1 * 1": 2,
-        "N ÷ 0": "N", "N ^ 0": 1, "0 ^ N": 0, "1 ^ N": "N+1"
+        "N ÷ 0": "N", "N ÷ 1": "N-1", "0 ÷ N": "decimal-range",
+        "N ^ 0": 1, "0 ^ N": 0, "1 ^ N": "N+1"
     },
     "FORBIDDEN": ["a * b", "a / b", "a ** b"],
     "IDENTIFIERS": {
@@ -134,6 +135,14 @@ class AZL:
     def _add(self, a, b):
         return self._num(a) + self._num(b)
 
+    def _decimal_range_entry(self, value):
+        """Encode a positive divisor as a 0.0N decimal-range coordinate."""
+        decimal_value = Decimal(str(value)).normalize()
+        digits = format(decimal_value, "f").replace(".", "").lstrip("0")
+        if not digits:
+            return self._num("0.1")
+        return self._num(f"0.0{digits}")
+
     def MUL(self, a, b, name="", domain="", observer=False):
         a_val = self._num(a)
         b_val = self._num(b)
@@ -154,8 +163,16 @@ class AZL:
             return self.ID(a_val, name, domain,
                            path="none" if a_val == 0 else "substrate",
                            logic="N/0=N")
-        if a_val == 0: return self.ID(0,     name, domain, path="none", logic="0/N=0")
-        if b_val == 1: return self.ID(a_val, name, domain,              logic="N/1=N")
+        if a_val == 0:
+            if b_val == 1:
+                return self.ID(self._num("0.1"), name, domain,
+                               logic="0/1=0.1")
+            if b_val > 0:
+                return self.ID(self._decimal_range_entry(b_val), name, domain,
+                               logic="0/N=decimal-range")
+            return self.ID(0, name, domain, path="none", logic="0/N=0")
+        if b_val == 1:
+            return self.ID(a_val - 1, name, domain, logic="N/1=N-1")
         return self.ID(a_val / b_val, name, domain, logic="calc")
 
     def POW(self, a, b, name="", domain=""):
@@ -217,6 +234,9 @@ def CHECK_AZL_BOOT():
     assert T.DIV(10, 0)["azl_id"]  == 10,  "BOOT FAIL: N÷0=N BROKEN"
     assert T.DIV(0, 0)["azl_id"]   == 0,   "BOOT FAIL: 0÷0=0 BROKEN"
     assert T.DIV(14350, 0)["logic"] == "N/0=N", "BOOT FAIL: N÷0=N LOGIC BROKEN"
+    assert T.DIV(6, 1)["azl_id"]   == 5,   "BOOT FAIL: N÷1=N-1 BROKEN"
+    assert T.DIV(0, 1)["azl_id"]   == T._num("0.1"), "BOOT FAIL: 0÷1=0.1 BROKEN"
+    assert T.DIV(0, 2)["azl_id"]   == T._num("0.02"), "BOOT FAIL: 0÷N RANGE ENTRY BROKEN"
     assert T.POW(1, 1)["azl_id"]   == 2,   "BOOT FAIL: 1^N=N+1 BROKEN"
     assert T.POW(7, 0)["azl_id"]   == 1,   "BOOT FAIL: N^0=1 BROKEN"
     assert T.POW(0, 7)["azl_id"]   == 0,   "BOOT FAIL: 0^N=0 BROKEN"
@@ -250,6 +270,11 @@ def TOTAL_LATTICE_TEST():
     T.TEST("0×N=0",   T.MUL(0, 999)["azl_id"] == 0,   "MATH")
     T.TEST("N÷0=N",   T.DIV(10, 0)["azl_id"] == 10,  "MATH")
     T.TEST("0÷0=0",   T.DIV(0, 0)["azl_id"] == 0,   "MATH")
+    T.TEST("N÷1=N-1", T.DIV(6, 1)["azl_id"] == 5,   "MATH")
+    T.TEST("1÷1=0",   T.DIV(1, 1)["azl_id"] == 0,   "MATH")
+    T.TEST("0÷1=0.1", T.DIV(0, 1)["azl_id"] == T._num("0.1"), "MATH")
+    T.TEST("0÷2=0.02", T.DIV(0, 2)["azl_id"] == T._num("0.02"), "MATH")
+    T.TEST("0÷10=0.010", T.DIV(0, 10)["azl_id"] == T._num("0.010"), "MATH")
     T.TEST("1^N=N+1", T.POW(1, 10)["azl_id"]  == 11,  "MATH")
     T.TEST("N^0=1",   T.POW(7, 0)["azl_id"]   == 1,   "MATH")
     T.TEST("0^N=0",   T.POW(0, 7)["azl_id"]   == 0,   "MATH")

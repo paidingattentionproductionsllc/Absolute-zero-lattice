@@ -562,7 +562,16 @@ def run_azl_core_tests() -> dict:
         if a==0: return 0
         if b==1: return a+1
         return a*b
-    def div(a,b): return a if b==0 else (0 if a==0 else a/b)
+    def decimal_range_entry(value):
+        digits = format(Decimal(str(value)).normalize(), "f").replace(".", "").lstrip("0")
+        return float(Decimal(f"0.0{digits}")) if digits else 0.1
+    def div(a,b):
+        if b==0: return a
+        if a==0:
+            if b==1: return 0.1
+            return decimal_range_entry(b) if b>0 else 0
+        if b==1: return a-1
+        return a/b
 
     tests = []
     def T(name, result, expected):
@@ -576,7 +585,11 @@ def run_azl_core_tests() -> dict:
     T("N×2=2N",   mul(5,2),  10)
     T("N÷0=N",    div(5,0),  5)
     T("0÷0=0",    div(0,0),  0)
-    T("0÷N=0",    div(0,5),  0)
+    T("N÷1=N-1",  div(6,1),  5)
+    T("1÷1=0",    div(1,1),  0)
+    T("0÷1=0.1",  div(0,1),  0.1)
+    T("0÷2=0.02", div(0,2),  0.02)
+    T("0÷10=0.010", div(0,10), 0.01)
     T("Zero layer VOID",  azl_range(0)["layer"],   "VOID")
     T("One layer SELF",   azl_range(1)["layer"],   "SELF")
     T("Two layer ACTION", azl_range(2)["layer"],   "ACTION")
@@ -587,6 +600,9 @@ def run_azl_core_tests() -> dict:
     T("N÷0 preserves",    div(14350,0),                               14350)
     from main import AZL
     T("Engine N÷0=N",     AZL().DIV(10,0)["azl_id"],                  10)
+    T("Engine N÷1=N-1",   AZL().DIV(6,1)["azl_id"],                   5)
+    T("Engine 0÷1=0.1",   AZL().DIV(0,1)["azl_id"],                   Decimal("0.1"))
+    T("Engine 0÷N range", AZL().DIV(0,10)["azl_id"],                  Decimal("0.01"))
     T("1×1=1 IMPOSSIBLE", honesty_check("1×1=1")["status"],           "IMPOSSIBLE")
     T("Map proton POSSIBLE",honesty_check("map proton")["status"],     "POSSIBLE")
 

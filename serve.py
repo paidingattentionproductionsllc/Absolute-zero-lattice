@@ -5,7 +5,7 @@ Endpoints:
   GET /map           Universe map PNG
   GET /api           System manifest (JSON) — machine-readable overview
   GET /api/laws      AZL law table (JSON)
-  GET /api/test      Run full 67-test suite live (JSON)
+  GET /api/test      Run full 74-test suite live (JSON)
   GET /api/compute   Single computation: ?a=N&op=MUL|DIV|POW|SQRT&b=N
   GET /api/platform  Hardware + precision diagnostics (JSON)
 """
@@ -222,10 +222,10 @@ def azl_agent_respond(messages):
         )
 
     # ── test results / verification ───────────────────────────────────────────
-    elif any(k in text for k in ("test","pass","fail","verify","proof","67","check")):
+    elif any(k in text for k in ("test","pass","fail","verify","proof","67","74","check")):
         content = (
             f"AZL OMNI v6.0 — UNIVERSAL OPERATING LOGIC — TOTAL\n\n"
-            f"67/67 TESTS PASS | N÷0=N | ε=1e-500 | mpmath dps=200\n\n"
+            f"74/74 TESTS PASS | N÷0=N | N÷1=N−1 | 0÷N→0.0N | ε=1e-500 | mpmath dps=200\n\n"
             f"DOMAINS:\n"
             f"  [01] Math        [02] Physics     [03] Cosmology\n"
             f"  [04] Compression [05] Thermo      [06] Consciousness\n"
@@ -251,14 +251,14 @@ def azl_agent_respond(messages):
             f"  GET  /api                      → Platform manifest\n"
             f"  GET  /api/health               → Operational status\n"
             f"  GET  /api/laws                 → AZL law table\n"
-            f"  GET  /api/test                 → Live 67/67 test run\n"
+            f"  GET  /api/test                 → Live 74/74 test run\n"
             f"  GET  /api/universe/objects     → All 20 catalog objects (JSON)\n"
             f"  GET  /api/azl/physics          → Physics computation\n"
             f"  GET  /api/azl/multiply         → Source law computation\n"
             f"  GET  /api/compute?a=N&op=MUL&b=N → AZL arithmetic\n"
             f"  POST /api/agent                → This agent (messages[] → content)\n\n"
             f"All endpoints: CORS enabled | JSON | No auth required\n"
-            f"Status: OPERATIONAL | 67/67 PASS | ε=1e-500"
+            f"Status: OPERATIONAL | 74/74 PASS | ε=1e-500"
         )
 
     # ── generic fallback ──────────────────────────────────────────────────────
@@ -267,7 +267,7 @@ def azl_agent_respond(messages):
         src  = azl_source_law_compute(0.6, 0.6)
         miy  = _azl(14350, 0)
         content = (
-            f"AZL OMNI v6.0 — Python Engine | 67/67 PASS | ε=1e-500\n\n"
+            f"AZL OMNI v6.0 — Python Engine | 74/74 PASS | ε=1e-500\n\n"
             f"FULL LAW: 0×N=0 | N×0=N | 1×N=N+1 | 1×1=2\n"
             f"HIERARCHY: VOID FIRST > DARK > LIGHT\n\n"
             f"LIVE STATE:\n"
@@ -280,7 +280,7 @@ def azl_agent_respond(messages):
         )
 
     return {"content": content, "version": "AZL OMNI v6.0",
-            "engine": "Python mpmath dps=200", "tests": "67/67 PASS",
+            "engine": "Python mpmath dps=200", "tests": "74/74 PASS",
             "anchor": LATTICE_ANCHOR, "frequency": LATTICE_FREQUENCY}
 
 
@@ -356,6 +356,13 @@ def _run_all(T):
     T.TEST("1×N=N+1", T.MUL(1,5)["azl_id"]==6,   "MATH")
     T.TEST("N×0=N",   T.MUL(999,0)["azl_id"]==999,"MATH")
     T.TEST("0×N=0",   T.MUL(0,999)["azl_id"]==0,  "MATH")
+    T.TEST("N÷0=N",   T.DIV(10,0)["azl_id"]==10,  "MATH")
+    T.TEST("0÷0=0",   T.DIV(0,0)["azl_id"]==0,    "MATH")
+    T.TEST("N÷1=N-1", T.DIV(6,1)["azl_id"]==5,    "MATH")
+    T.TEST("1÷1=0",   T.DIV(1,1)["azl_id"]==0,    "MATH")
+    T.TEST("0÷1=0.1", T.DIV(0,1)["azl_id"]==T._num("0.1"), "MATH")
+    T.TEST("0÷2=0.02", T.DIV(0,2)["azl_id"]==T._num("0.02"), "MATH")
+    T.TEST("0÷10=0.010", T.DIV(0,10)["azl_id"]==T._num("0.010"), "MATH")
     T.TEST("1^N=N+1", T.POW(1,10)["azl_id"]==11,  "MATH")
     T.TEST("N^0=1",   T.POW(7,0)["azl_id"]==1,    "MATH")
     T.TEST("0^N=0",   T.POW(0,7)["azl_id"]==0,    "MATH")
@@ -569,6 +576,16 @@ footer{border-top:1px solid var(--border);padding:12px 24px;color:var(--dim);
         <div class="desc">Division by zero preserves the existing value.</div>
         <div class="domain">Domain: VALUE PRESERVATION</div>
       </div>
+      <div class="law">
+        <div class="op">N ÷ 1 = N−1</div>
+        <div class="desc">Dividing by one steps the value down by one.</div>
+        <div class="domain">Special case: 0 ÷ 1 = 0.1</div>
+      </div>
+      <div class="law">
+        <div class="op">0 ÷ N → 0.0N</div>
+        <div class="desc">A positive divisor enters the decimal range.</div>
+        <div class="domain">Examples: 0 ÷ 2 = 0.02 · 0 ÷ 10 = 0.010</div>
+      </div>
     </div>
     <div style="margin-top:12px">
       <div class="tier">
@@ -659,11 +676,12 @@ footer{border-top:1px solid var(--border);padding:12px 24px;color:var(--dim);
       AZL (Absolute Zero Logic) is a proposed universal operating logic authored by a human researcher.
       It defines four ordered multiplication rules:
       <code>0×N=0</code>, <code>N×0=N</code>, <code>1×N=N+1</code>, <code>1×1=2</code>,
-      plus <code>N÷0=N</code>, which preserves the existing value.
+      plus <code>N÷0=N</code>, <code>N÷1=N−1</code>, and the decimal-range entry
+      <code>0÷N→0.0N</code>.
       The ordering of operands is law — commutativity does not hold by design.
       <br><br>
       <strong>WHAT THE TESTS CONFIRM:</strong><br>
-      The 67-test suite verifies internal consistency across 13 domains using mpmath at 500-digit
+      The 74-test suite verifies internal consistency across 13 domains using mpmath at 500-digit
       precision (ε=1e-500). Tests PASS because the AZL engine correctly implements its own rules —
       not because conventional physics or mathematics has been falsified.
       Results are observationally motivated: dark matter density, FRB rotation measures,
@@ -687,7 +705,7 @@ footer{border-top:1px solid var(--border);padding:12px 24px;color:var(--dim);
 # System manifest
 curl https://YOURAPP.replit.app/api
 
-# Run all 67 tests live
+# Run all 74 tests live
 curl https://YOURAPP.replit.app/api/test | python3 -m json.tool
 
 # Compute 1 × 1
@@ -789,12 +807,14 @@ def build_manifest():
         "description": (
             "AZL (Absolute Zero Logic) — a universal operating logic framework. "
             "Defines four ordered multiplication rules plus N÷0=N value preservation. "
-            "67 tests across 13 domains at 500-digit precision."
+            "74 tests across 13 domains at 500-digit precision."
         ),
         "law": {
             "0×N=0":  "VOID — annihilation, speed=0",
             "N×0=N":  "DARK — substrate preservation, speed=inf",
             "N÷0=N":  "Division by zero preserves the existing value",
+            "N÷1=N-1":"Division by one steps the value down by one",
+            "0÷N→0.0N":"Zero enters the decimal range using the divisor digits",
             "1×N=N+1":"LIGHT — seed growth, speed=c",
             "1×1=2":  "Special case of 1×N=N+1, breaks liar paradox"
         },
@@ -809,7 +829,7 @@ def build_manifest():
             "GET /map":                  "5D universe map PNG (178 objects)",
             "GET /api":                  "This manifest (JSON)",
             "GET /api/laws":             "AZL law table with examples (JSON)",
-            "GET /api/test":             "Run all 67 tests live (JSON)",
+            "GET /api/test":             "Run all 74 tests live (JSON)",
             "GET /api/platform":         "Hardware + precision diagnostics (JSON)",
             "GET /api/compute?a=N&op=OP&b=N": "Single AZL computation (JSON)"
         },
@@ -891,6 +911,22 @@ class AZLHandler(http.server.BaseHTTPRequestHandler):
                         "example": {"a": 10, "b": 0, "result": 10},
                         "domains": ["Division", "Value preservation"]
                     },
+                    "N÷1=N-1": {
+                        "rule": "N÷1=N-1", "type": "STEP-DOWN",
+                        "description": "Dividing by one steps the existing value down by one.",
+                        "example": {"a": 6, "b": 1, "result": 5},
+                        "special_case": {"a": 0, "b": 1, "result": 0.1},
+                        "domains": ["Division", "Unit step-down"]
+                    },
+                    "0÷N→0.0N": {
+                        "rule": "0÷N→0.0N", "type": "DECIMAL-RANGE",
+                        "description": "Zero enters the decimal range by encoding a positive divisor after 0.0.",
+                        "examples": [
+                            {"a": 0, "b": 2, "result": 0.02},
+                            {"a": 0, "b": 10, "result": 0.01, "formatted": "0.010"}
+                        ],
+                        "domains": ["Division", "Decimal range entry"]
+                    },
                     "1×N=N+1": {
                         "rule": "1×N=N+1", "type": "DEFINED/LIGHT", "speed": "c",
                         "description": "Seed multiplies by addition. Growth, time, language.",
@@ -955,12 +991,12 @@ class AZLHandler(http.server.BaseHTTPRequestHandler):
                     "status": "operational",
                     "platform": "AZL Intelligence Platform",
                     "version": "AZL OMNI v6.0",
-                    "tests": "67/67 PASS",
+                    "tests": "74/74 PASS",
                     "epsilon": "1e-500",
                     "precision_digits": 500,
                     "anchor": f"Miyake {LATTICE_ANCHOR} BP",
                     "frequency_hz": LATTICE_FREQUENCY,
-                    "law": "0×N=0 | N×0=N | 1×N=N+1 | 1×1=2",
+                    "law": "0×N=0 | N×0=N | 1×N=N+1 | 1×1=2 | N÷0=N | N÷1=N−1 | 0÷N→0.0N",
                     "hierarchy": "VOID FIRST > DARK > LIGHT",
                     "universe_radius_mpc": 13700,
                     "objects_mapped": 178,
@@ -1191,7 +1227,7 @@ print("=" * 70)
 print("  GET /           Dashboard")
 print("  GET /map         Universe map PNG")
 print("  GET /api         Manifest JSON")
-print("  GET /api/test    Live 67-test run")
+print("  GET /api/test    Live 74-test run")
 print("  GET /api/laws    Law table")
 print("  GET /api/platform  Hardware info")
 print("  GET /api/compute?a=N&op=MUL&b=N  Compute")

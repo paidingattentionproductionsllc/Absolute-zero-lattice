@@ -7,6 +7,7 @@
 import json
 import os
 import math
+import re
 import time
 import threading
 import urllib.request
@@ -190,9 +191,13 @@ def consciousness_map(stimulus_azl: str) -> dict:
 def honesty_check(action: str) -> dict:
     """Distinguish IMPOSSIBLE (violates AZL law) vs POSSIBLE."""
     a = action.lower()
-    if any(k in a for k in ("divide by zero","n÷0","÷0")):
-        return {"action": action, "status": "IMPOSSIBLE",
-                "reason": "N÷0=VOID — division by zero voids information per AZL law"}
+    divides_by_zero = (
+        any(k in a for k in ("divide by zero", "division by zero", "÷0"))
+        or re.search(r"(?<![\w.])(?:n|\d+(?:\.\d+)?)\s*/\s*0(?:\.0+)?(?![\d.])", a)
+    )
+    if divides_by_zero:
+        return {"action": action, "status": "POSSIBLE",
+                "reason": "N÷0=N — division by zero preserves the existing value per AZL law"}
     if "1×1=1" in a or "1*1=1" in a:
         return {"action": action, "status": "IMPOSSIBLE",
                 "reason": "Violates 1×1=2 — self reflecting on self creates new state, not identity"}
@@ -557,7 +562,7 @@ def run_azl_core_tests() -> dict:
         if a==0: return 0
         if b==1: return a+1
         return a*b
-    def div(a,b): return None if b==0 else (0 if a==0 else a/b)
+    def div(a,b): return a if b==0 else (0 if a==0 else a/b)
 
     tests = []
     def T(name, result, expected):
@@ -569,7 +574,8 @@ def run_azl_core_tests() -> dict:
     T("N×1=N+1",  mul(5,1),  6)
     T("1×1=2",    mul(1,1),  2)
     T("N×2=2N",   mul(5,2),  10)
-    T("N÷0=VOID", div(5,0),  None)
+    T("N÷0=N",    div(5,0),  5)
+    T("0÷0=0",    div(0,0),  0)
     T("0÷N=0",    div(0,5),  0)
     T("Zero layer VOID",  azl_range(0)["layer"],   "VOID")
     T("One layer SELF",   azl_range(1)["layer"],   "SELF")
@@ -577,7 +583,8 @@ def run_azl_core_tests() -> dict:
     T("2.5 → AZL",        coordinate_to_azl(2.5),  "AZL-2500000000")
     T("AZL→2.0",          azl_to_coordinate("AZL-2000000000"), 2.0)
     T("Electron #1",      particle_map("electron",1)["azl_address"],  "AZL-0000000001")
-    T("N÷0 IMPOSSIBLE",   honesty_check("divide by zero")["status"],  "IMPOSSIBLE")
+    T("N÷0 POSSIBLE",     honesty_check("10 / 0")["status"],         "POSSIBLE")
+    T("N÷0 preserves",    div(14350,0),                               14350)
     T("1×1=1 IMPOSSIBLE", honesty_check("1×1=1")["status"],           "IMPOSSIBLE")
     T("Map proton POSSIBLE",honesty_check("map proton")["status"],     "POSSIBLE")
 

@@ -151,12 +151,9 @@ class AZL:
         b_val = self._num(b)
         self.trace.append(f"DIV({a_val}, {b_val})")
         if b_val == 0:
-            if a_val == 0:
-                self._log_anomaly("DIV", a, b, 0, "0/0 handled as 0")
-                return self.ID(0,     name, domain, path="none",      logic="0/0=0")
-            else:
-                self._log_anomaly("DIV", a, b, "inf", "N/0 = processing limit hit")
-                return self.ID("inf", name, domain, path="undefined", logic="N/0=inf")
+            return self.ID(a_val, name, domain,
+                           path="none" if a_val == 0 else "substrate",
+                           logic="N/0=N")
         if a_val == 0: return self.ID(0,     name, domain, path="none", logic="0/N=0")
         if b_val == 1: return self.ID(a_val, name, domain,              logic="N/1=N")
         return self.ID(a_val / b_val, name, domain, logic="calc")
@@ -217,6 +214,8 @@ def CHECK_AZL_BOOT():
     assert T.MUL(100, 0)["azl_id"] == 100, "BOOT FAIL: N×0=N BROKEN"
     assert T.MUL(1, 1)["azl_id"]   == 2,   "BOOT FAIL: 1×1=2 BROKEN"
     assert T.MUL(1, 5)["azl_id"]   == 6,   "BOOT FAIL: 1×N=N+1 BROKEN"
+    assert T.DIV(10, 0)["azl_id"]  == 10,  "BOOT FAIL: N÷0=N BROKEN"
+    assert T.DIV(0, 0)["azl_id"]   == 0,   "BOOT FAIL: 0÷0=0 BROKEN"
     assert T.POW(1, 1)["azl_id"]   == 2,   "BOOT FAIL: 1^N=N+1 BROKEN"
     assert T.POW(7, 0)["azl_id"]   == 1,   "BOOT FAIL: N^0=1 BROKEN"
     assert T.POW(0, 7)["azl_id"]   == 0,   "BOOT FAIL: 0^N=0 BROKEN"
@@ -248,6 +247,8 @@ def TOTAL_LATTICE_TEST():
     T.TEST("1×N=N+1", T.MUL(1, 5)["azl_id"]   == 6,   "MATH")
     T.TEST("N×0=N",   T.MUL(999, 0)["azl_id"] == 999, "MATH")
     T.TEST("0×N=0",   T.MUL(0, 999)["azl_id"] == 0,   "MATH")
+    T.TEST("N÷0=N",   T.DIV(10, 0)["azl_id"] == 10,  "MATH")
+    T.TEST("0÷0=0",   T.DIV(0, 0)["azl_id"] == 0,   "MATH")
     T.TEST("1^N=N+1", T.POW(1, 10)["azl_id"]  == 11,  "MATH")
     T.TEST("N^0=1",   T.POW(7, 0)["azl_id"]   == 1,   "MATH")
     T.TEST("0^N=0",   T.POW(0, 7)["azl_id"]   == 0,   "MATH")

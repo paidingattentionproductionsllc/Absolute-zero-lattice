@@ -788,6 +788,7 @@ def build_manifest():
         "law": {
             "0×N=0":  "VOID — annihilation, speed=0",
             "N×0=N":  "DARK — substrate preservation, speed=inf",
+            "N÷0=N":  "Division by zero preserves the existing value",
             "1×N=N+1":"LIGHT — seed growth, speed=c",
             "1×1=2":  "Special case of 1×N=N+1, breaks liar paradox"
         },
@@ -877,6 +878,12 @@ class AZLHandler(http.server.BaseHTTPRequestHandler):
                         "description": "Contact with void preserves substrate at infinite speed.",
                         "example": {"a": 14350, "b": 0, "result": 14350},
                         "domains": ["Dark matter", "Miyake 14350 BP", "Turing tape", "Past", "You"]
+                    },
+                    "N÷0=N": {
+                        "rule": "N÷0=N", "type": "PRESERVED",
+                        "description": "Dividing an existing value by zero preserves that value.",
+                        "example": {"a": 10, "b": 0, "result": 10},
+                        "domains": ["Division", "Value preservation"]
                     },
                     "1×N=N+1": {
                         "rule": "1×N=N+1", "type": "DEFINED/LIGHT", "speed": "c",

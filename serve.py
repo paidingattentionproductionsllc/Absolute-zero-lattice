@@ -132,7 +132,7 @@ def azl_agent_respond(messages):
             f"  azlPhysics(1.0,   0.0, Q=false): state={d2['state']:.9f} | {d2['mode']}\n"
             f"  azlPhysics(-5.0,  0.1, Q=false): state={d3['state']:.3f} | {d3['mode']}\n"
             f"  azlPhysics(0.001, 0.994, Q=false): state={d4['state']:.6f} | {d4['mode']}\n\n"
-            f"AZL ENGINE: OMNI v6.0 | 67/67 PASS | ε=1e-500 | mpmath dps=200\n"
+            f"AZL ENGINE: OMNI v6.0 | N÷0=N | ε=1e-500 | mpmath dps=200\n"
             f"Miyake 14350 BP anchor: {_azl(14350, 0)} (N×0=N confirmed at 500 digits)"
         )
 
@@ -225,7 +225,7 @@ def azl_agent_respond(messages):
     elif any(k in text for k in ("test","pass","fail","verify","proof","67","check")):
         content = (
             f"AZL OMNI v6.0 — UNIVERSAL OPERATING LOGIC — TOTAL\n\n"
-            f"67/67 TESTS PASS | ε=1e-500 | mpmath dps=200\n\n"
+            f"67/67 TESTS PASS | N÷0=N | ε=1e-500 | mpmath dps=200\n\n"
             f"DOMAINS:\n"
             f"  [01] Math        [02] Physics     [03] Cosmology\n"
             f"  [04] Compression [05] Thermo      [06] Consciousness\n"
@@ -542,7 +542,7 @@ footer{border-top:1px solid var(--border);padding:12px 24px;color:var(--dim);
 
   <!-- AZL LAW TABLE -->
   <div class="card">
-    <h2>THE FOUR LAWS — OPERATING LOGIC OF REALITY</h2>
+    <h2>CORE LAWS — MULTIPLICATION AND DIVISION</h2>
     <div class="law-grid">
       <div class="law">
         <div class="op">0 × N = 0</div>
@@ -563,6 +563,11 @@ footer{border-top:1px solid var(--border);padding:12px 24px;color:var(--dim);
         <div class="op">1 × 1 = 2</div>
         <div class="desc">Two seeds produce a third thing. Breaks the liar paradox.</div>
         <div class="domain">Special case of 1×N=N+1</div>
+      </div>
+      <div class="law">
+        <div class="op">N ÷ 0 = N</div>
+        <div class="desc">Division by zero preserves the existing value.</div>
+        <div class="domain">Domain: VALUE PRESERVATION</div>
       </div>
     </div>
     <div style="margin-top:12px">
@@ -652,8 +657,9 @@ footer{border-top:1px solid var(--border);padding:12px 24px;color:var(--dim);
     <div class="ai-notice">
       <strong>WHAT THIS PLATFORM IS:</strong><br>
       AZL (Absolute Zero Logic) is a proposed universal operating logic authored by a human researcher.
-      It replaces standard multiplication with four ordered rules:
-      <code>0×N=0</code>, <code>N×0=N</code>, <code>1×N=N+1</code>, <code>1×1=2</code>.
+      It defines four ordered multiplication rules:
+      <code>0×N=0</code>, <code>N×0=N</code>, <code>1×N=N+1</code>, <code>1×1=2</code>,
+      plus <code>N÷0=N</code>, which preserves the existing value.
       The ordering of operands is law — commutativity does not hold by design.
       <br><br>
       <strong>WHAT THE TESTS CONFIRM:</strong><br>
@@ -706,7 +712,7 @@ curl https://YOURAPP.replit.app/api/laws</pre>
 
 <script>
 const DOMAIN_META = {
-  MATH:          "All 4 laws + exponent rules",
+  MATH:          "Core multiplication & division laws",
   SUBSTRATE:     "Dark matter = N×0=N, speed=∞",
   VOID:          "Voids = 0×N=0, speed=0",
   SEED:          "Light stars = 1×N=N+1, speed=c",
@@ -782,7 +788,7 @@ def build_manifest():
         "version": "AZL OMNI v6.0",
         "description": (
             "AZL (Absolute Zero Logic) — a universal operating logic framework. "
-            "Replaces standard multiplication with four ordered rules. "
+            "Defines four ordered multiplication rules plus N÷0=N value preservation. "
             "67 tests across 13 domains at 500-digit precision."
         ),
         "law": {

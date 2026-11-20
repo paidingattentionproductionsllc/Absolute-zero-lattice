@@ -585,6 +585,8 @@ def run_azl_core_tests() -> dict:
     T("Electron #1",      particle_map("electron",1)["azl_address"],  "AZL-0000000001")
     T("N÷0 POSSIBLE",     honesty_check("10 / 0")["status"],         "POSSIBLE")
     T("N÷0 preserves",    div(14350,0),                               14350)
+    from main import AZL
+    T("Engine N÷0=N",     AZL().DIV(10,0)["azl_id"],                  10)
     T("1×1=1 IMPOSSIBLE", honesty_check("1×1=1")["status"],           "IMPOSSIBLE")
     T("Map proton POSSIBLE",honesty_check("map proton")["status"],     "POSSIBLE")
 

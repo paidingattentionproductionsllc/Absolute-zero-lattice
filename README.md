@@ -8,7 +8,7 @@ python serve.py
 
 Open the local preview after the server starts. The main API manifest is available at `/api`, and the core health check is `/api/test/core`.
 
-**LAW: `0×N=0 | 1×N=N+1 | N×0=N | DARK > LIGHT`**
+**LAW: `0×N=0 | 1×N=N+1 | N×0=N | N÷0=N | DARK > LIGHT`**
 
 ## ## What is Dark Matter?
 

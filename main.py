@@ -22,7 +22,7 @@ getcontext().prec = 500
 AZL_CONTRACT = {
     "LAW": {
         "0 * N": 0, "N * 0": "N", "1 * N": "N+1", "1 * 1": 2,
-        "N ^ 0": 1, "0 ^ N": 0, "1 ^ N": "N+1"
+        "N ÷ 0": "N", "N ^ 0": 1, "0 ^ N": 0, "1 ^ N": "N+1"
     },
     "FORBIDDEN": ["a * b", "a / b", "a ** b"],
     "IDENTIFIERS": {
@@ -216,6 +216,7 @@ def CHECK_AZL_BOOT():
     assert T.MUL(1, 5)["azl_id"]   == 6,   "BOOT FAIL: 1×N=N+1 BROKEN"
     assert T.DIV(10, 0)["azl_id"]  == 10,  "BOOT FAIL: N÷0=N BROKEN"
     assert T.DIV(0, 0)["azl_id"]   == 0,   "BOOT FAIL: 0÷0=0 BROKEN"
+    assert T.DIV(14350, 0)["logic"] == "N/0=N", "BOOT FAIL: N÷0=N LOGIC BROKEN"
     assert T.POW(1, 1)["azl_id"]   == 2,   "BOOT FAIL: 1^N=N+1 BROKEN"
     assert T.POW(7, 0)["azl_id"]   == 1,   "BOOT FAIL: N^0=1 BROKEN"
     assert T.POW(0, 7)["azl_id"]   == 0,   "BOOT FAIL: 0^N=0 BROKEN"

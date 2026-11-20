@@ -1,1 +1,2 @@
 - [GitHub publication permissions](github-publication.md) — source publishes normally, but workflow files need separate write authorization.
+- [AZL division behavior](division-rules.md) — division by zero preserves the dividend, including zero divided by zero.
